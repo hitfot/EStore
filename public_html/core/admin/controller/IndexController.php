@@ -15,7 +15,9 @@ use core\base\controller\BaseController;
             
             $res = $db->get($table, [
                 'fields' => ['id', 'name'],
-                'where' => ['if' => 1, 'name' => 'Masha'],
+                'where' => ['if' => 1, 'name' => 'Masha', 'id' => 1],
+                'operand' => ['LIKE', 'LIKE%', '<>'],
+                'condition' => ['OR'],
                 'order' => ['name'],
                 'order_direction' => ['DESC']
             ]);

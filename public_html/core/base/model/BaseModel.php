@@ -145,9 +145,12 @@
                 $direct_count = 0;
 
                 foreach($set['order'] as $order){
+
                     if($set['order_direction'][$direct_count]){
+
                         $order_direction = strtoupper($set['order_direction'][$direct_count]);
                         $direct_count++;
+
                     }else{
 
                         $order_direction = strtoupper($set['order_direction'][$direct_count - 1]);
@@ -164,6 +167,102 @@
             return $order_by;
         }
 
+        protected function createWhere($table = false, $set, $instruction = 'WHERE'){
+
+            $table = $table ? $table . '.' : '';
+
+            $where = '';
+
+            if(is_array($set['where']) && !empty($set['where'])){
+
+                $set['operand'] = (is_array($set['operand']) && !empty($set['operand'])) 
+                    ? $set['operand'] : ['='];
+
+                $set['condition'] = (is_array($set['condition']) && !empty($set['condition'])) 
+                    ? $set['condition'] : ['AND'];
+
+                $where = $instruction;
+                $operand_count = 0;
+                $condition_count = 0;
+
+                foreach ($set['where'] as $key => $value) {
+                    
+                    $where .= ' ';
+
+                    if($set['operand'][$operand_count]){
+
+                        $operand = strtoupper($set['operand'][$operand_count]);
+                        $operand_count++;
+
+                    }else{
+
+                        $order = strtoupper($set['operand'][$operand_count - 1]);
+
+                    }
+
+                    if(@$set['condition'][$condition_count]){
+
+                        $condition = strtoupper($set['condition'][$condition_count]);
+                        $condition_count++;
+
+                    }else{
+
+                        $condition = strtoupper($set['condition'][$condition_count - 1]);
+
+                    }
+
+                    if($operand === 'IN' || $operand === 'NOT IN'){
+
+                        if(is_string($value) && strpos($value, 'SELECT')){
+                            $in_str = $value;
+                        }else{
+                            if(is_array($value)) $temp_value = $value;
+                            else $temp_value = explode(',', $value);
+
+                            $in_str = '';
+
+                            foreach($temp_value as $item){
+                                $in_str .= "'" . trim($item) . "',";
+                            }
+                        }
+
+                        $where .= $table . $key . ' ' . $operand . '(' . trim($in_str, ',') . ') ' . $condition; 
+
+                    }elseif (strpos($operand, 'LIKE') !== false) {
+                        
+                        $like_template = explode('%', $operand);
+
+                        foreach($like_template as $lt_key => $lt){
+                            if(!$lt){
+                                if(!$lt_key){
+                                    $value = '%' . $value;
+                                }else{
+                                    $value .= '%';
+                                }
+                            }
+                        }
+
+                        $where .= $table . $key . ' LIKE ' . "'" . $value . "' " . $condition; 
+                        
+                    }else{
+
+                        if(strpos($value, 'SELECT') === 0){
+                            $where .= $table . $key . $operand . '(' . $value . ') ' . $condition;
+                        }else{
+                            $where .= $table . $key . $operand . "'" . $value . "' " . $condition;
+                        }
+
+                    }
+
+                }
+
+                $where = substr($where, 0, strrpos($where, $condition));
+
+            }   
+            
+            return $where;
+            
+        }
 
     }
 
