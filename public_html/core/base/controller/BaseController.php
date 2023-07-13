@@ -2,8 +2,8 @@
 
     namespace core\base\controller;
 
-use core\base\exceptions\RouteException;
-use core\base\settings\Settings;
+    use core\base\exceptions\RouteException;
+    use core\base\settings\Settings;
 
     abstract class BaseController {
 
