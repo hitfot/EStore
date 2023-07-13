@@ -11,9 +11,14 @@ use core\base\controller\BaseController;
 
             $db = Model::instance();
 
-            $query = "SELECT * FROM articles";
-
-            $res = $db->query($query);
+            $table = 'article';
+            
+            $res = $db->get($table, [
+                'fields' => ['id', 'name'],
+                'where' => ['if' => 1, 'name' => 'Masha'],
+                'order' => ['name'],
+                'order_direction' => ['DESC']
+            ]);
 
             exit('I am admin panel');
             
