@@ -27,7 +27,7 @@
                 $this->routes = Settings::get('routes');
 
                 if(!$this->routes){
-                    throw new RouteException('Сайт находится на техническом обслуживании');
+                    throw new RouteException('Отсутствуют маршруты в базовых настройках', 1);
                 }
 
                 $url = explode('/', substr($adress_str, strlen(PATH)));
@@ -36,7 +36,7 @@
 
                     array_shift($url);
 
-                    if($url[0] && is_dir($_SERVER['DOCUMENT_ROOT'] . PATH . $this->routes['plugins']['path'] . $url[0])){
+                    if(@$url[0] && is_dir($_SERVER['DOCUMENT_ROOT'] . PATH . $this->routes['plugins']['path'] . $url[0])){
 
                         $plugin = array_shift($url);
 
@@ -100,11 +100,7 @@
                 }
 
             }else{
-                try {
-                    throw new \Exception('Не корректная директория сайта');
-                } catch (\Exception $e) {
-                    exit($e->getMessage());
-                }
+                throw new RouteException('Не корректная директория сайта', 1);
             }
 
         }
